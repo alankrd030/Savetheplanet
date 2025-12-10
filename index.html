@@ -68,7 +68,7 @@
   <div class="card" id="quiz-container">
     <h1>Berlin Climate & Transport Quiz</h1>
     <p class="subtitle">
-      20 questions about climate action and transport in Berlin – based on official statistics and city sources.
+      20 questions about climate action and transport in Berlin , based on official statistics and city sources.
     </p>
 
     <div class="status-row">
@@ -172,7 +172,7 @@
       correctIndex: 0
     },
     {
-      question: "What does the term "transport transition" (Verkehrswende) mainly mean in Berlin?",
+      question: "What does the term transport transition (Verkehrswende) mainly mean in Berlin?",
       options: [
         "Making car use cheaper and easier.",
         "Changing transport so that emissions fall and more people use climate-friendly modes.",
@@ -231,7 +231,7 @@
       correctIndex: 0
     },
     {
-      question: "Roughly how many battery-electric buses does BVG already use in its bus fleet?",
+      question: "How many battery-electric buses does BVG already use in its bus fleet?",
       options: [
         "Only a handful of buses.",
         "Around a few hundred buses.",
@@ -352,15 +352,15 @@
 
     let message;
     if (percent === 100) {
-      message = "Incredible – you really know Berlin’s climate and transport topics in detail. Climate expert unlocked.";
+      message = "Incredible ,you really know Berlin’s climate and transport topics in detail. Climate expert unlocked.";
     } else if (percent >= 80) {
-      message = "Very strong! You have a solid understanding of climate action and mobility in Berlin. Just a few details left to polish.";
+      message = "Very strong. You have a solid understanding of climate action and mobility in Berlin. Just a few details left.";
     } else if (percent >= 60) {
-      message = "Good base! You know quite a bit already. With a bit more reading on Berlin’s climate goals you will level up quickly.";
+      message = "Good base. You know quite a bit already. With a bit more reading on Berlin’s climate goals you will level up quickly.";
     } else if (percent >= 40) {
       message = "Okay – you got some things right, but there is still room to grow. Use this quiz as a starting point.";
     } else {
-      message = "You are at the starting line – and that is totally fine. This result is a good reason to look more closely at Berlin’s climate and transport policies.";
+      message = "You are at the starting line  and that is totally fine. This result is a good reason to look more closely at Berlin’s climate and transport policies.";
     }
 
     resultMessageEl.textContent = message;
