@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Berlin Climate & Transport Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+    }
+    .page-wrapper { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 16px 16px 20px 16px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    h1 { font-size: 1.5rem; margin: 0 0 4px 0; }
+    .subtitle { font-size: 0.9rem; color: #6b7280; margin-bottom: 12px; }
+    .status-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 0.85rem; color: #4b5563; margin-bottom: 8px;
+    }
+    .question-text { font-size: 1rem; margin: 10px 0; }
+    .options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .option-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 6px 8px; border-radius: 6px; border: 1px solid #e5e7eb;
+      background: #f9fafb; cursor: pointer;
+    }
+    .option-item:hover { background: #eef2ff; }
+    .option-item input[type="radio"] { margin-top: 3px; }
+    .option-text { font-size: 0.95rem; }
+    .button-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    button {
+      border-radius: 999px; border: none; padding: 8px 16px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    }
+    #next-button { background: #2563eb; color: #ffffff; }
+    #restart-button, #play-again-button { background: #e5e7eb; color: #111827; }
+    #next-button:hover { background: #1d4ed8; }
+    #restart-button:hover, #play-again-button:hover { background: #d1d5db; }
+    .error-text { font-size: 0.85rem; color: #dc2626; min-height: 18px; margin-top: 4px; }
+    .result-title { font-size: 1.3rem; margin: 0 0 6px 0; }
+    .result-main { font-size: 1rem; margin-bottom: 4px; }
+    .result-extra { font-size: 0.9rem; color: #4b5563; margin-bottom: 8px; }
+    .result-message {
+      font-size: 0.95rem; margin-top: 6px; padding-top: 6px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .sources-block {
+      margin-top: 14px; padding-top: 8px; border-top: 1px solid #e5e7eb;
+    }
+    .sources-block h2 { font-size: 0.95rem; margin: 0 0 4px 0; }
+    .sources-block ul {
+      margin: 0; padding-left: 18px; font-size: 0.85rem; color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <div class="card" id="quiz-container">
+    <h1>Berlin Climate & Transport Quiz</h1>
+    <p class="subtitle">
+      20 questions about climate action and transport in Berlin – based on official statistics and city sources.
+    </p>
+
+    <div class="status-row">
+      <div id="progress-text">Question 1 of 20</div>
+      <div id="score-text">Score: 0</div>
+    </div>
+
+    <div id="question-text" class="question-text"></div>
+    <div id="options" class="options"></div>
+    <div id="error-text" class="error-text"></div>
+
+    <div class="button-row">
+      <button id="restart-button" type="button" style="display:none;">Restart</button>
+      <button id="next-button" type="button">Next</button>
+    </div>
+  </div>
+
+  <div class="card" id="result-container" style="display:none;">
+    <h1 class="result-title">Your result</h1>
+    <p id="result-main" class="result-main"></p>
+    <p id="result-extra" class="result-extra"></p>
+    <p id="result-message" class="result-message"></p>
+
+    <div class="sources-block">
+      <h2>Sources (short)</h2>
+      <ul>
+        <li>Amt für Statistik Berlin-Brandenburg: Energy and CO₂ balance 2024 (press release no. 167/2025).</li>
+        <li>Berlin Senate (economy/energy): CO₂ emissions and energy use continue to fall (press release 2025).</li>
+        <li>BVG: Environmental and climate protection – information on electric buses and rail.</li>
+        <li>Berlin Partner: Berlin companies and their contribution to the transport transition.</li>
+      </ul>
+    </div>
+
+    <div class="button-row" style="margin-top:12px; justify-content:center;">
+      <button id="play-again-button" type="button">Play again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const questions = [
+    {
+      question: "Which German city is the focus of this climate and transport quiz?",
+      options: ["Munich", "Berlin", "Hamburg"],
+      correctIndex: 1
+    },
+    {
+      question: "Which company operates most buses, underground trains and trams in Berlin?",
+      options: ["BVG", "Deutsche Bahn long-distance", "Lufthansa"],
+      correctIndex: 0
+    },
+    {
+      question: "Which two BVG modes already run fully on electricity in everyday operation?",
+      options: ["Underground and tram", "Bus and ferry", "Bus and cable car"],
+      correctIndex: 0
+    },
+    {
+      question: "Why is public transport important for climate protection in Berlin?",
+      options: [
+        "It reduces car traffic and therefore CO₂ emissions.",
+        "It mainly exists for tourists.",
+        "It increases traffic jams in the city."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "What is one official long-term goal of the State of Berlin?",
+      options: [
+        "To become climate-neutral by the mid-21st century.",
+        "To double CO₂ emissions by 2030.",
+        "To ban all public transport."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "According to current statistics, did Berlin’s total energy-related CO₂ emissions in 2024 go up or down compared to the previous year?",
+      options: [
+        "They went down.",
+        "They stayed exactly the same.",
+        "They went sharply up."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "How did CO₂ emissions from road traffic in Berlin develop in 2024?",
+      options: [
+        "They were almost stable and changed only very slightly.",
+        "They doubled.",
+        "They fell to zero."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "Which two areas in Berlin showed a clear decrease in CO₂ emissions in 2024 according to the statistics?",
+      options: [
+        "Households and rail transport.",
+        "Road traffic and aviation.",
+        "Industry and airports."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "What does the term "transport transition" (Verkehrswende) mainly mean in Berlin?",
+      options: [
+        "Making car use cheaper and easier.",
+        "Changing transport so that emissions fall and more people use climate-friendly modes.",
+        "Focusing only on air traffic."
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "Why is company or business traffic important for climate action in Berlin?",
+      options: [
+        "It makes up a noticeable share of total traffic and offers reduction potential.",
+        "It is almost non-existent in the city.",
+        "It has nothing to do with emissions."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "What is meant by "sustainable corporate mobility" in Berlin companies?",
+      options: [
+        "Organising employee travel in a way that reduces emissions and still keeps people mobile.",
+        "Giving everyone a bigger company car.",
+        "Banning all forms of public transport for staff."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "Which vehicle type is used in Berlin by some companies and bakeries for climate-friendly deliveries?",
+      options: ["Cargo bikes", "Private jets", "Cruise ships"],
+      correctIndex: 0
+    },
+    {
+      question: "Which type of vehicles is being registered more and more in Berlin to support climate goals?",
+      options: [
+        "Electric vehicles.",
+        "Purely diesel trucks.",
+        "Only classic sports cars."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "In Berlin, are many electric cars used by companies or almost all only privately?",
+      options: [
+        "Many electric cars are used commercially by companies.",
+        "Almost all electric cars are only private.",
+        "Electric cars are banned for companies."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "What is one typical measure for more climate-friendly company mobility?",
+      options: [
+        "Offering bicycle leasing or support for cycling.",
+        "Building more free car parking spaces for staff.",
+        "Paying bonuses for frequent flying."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "Roughly how many battery-electric buses does BVG already use in its bus fleet?",
+      options: [
+        "Only a handful of buses.",
+        "Around a few hundred buses.",
+        "Several tens of thousands of buses."
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "What is one future goal of BVG for its vehicle fleet in the 2030s?",
+      options: [
+        "To operate its fleet without fossil fuels.",
+        "To return completely to diesel buses.",
+        "To stop all bus and rail services."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "What kind of infrastructure does BVG need in order to use more electric buses?",
+      options: [
+        "More motorways and new car parks.",
+        "New e-bus depots and charging points at stops and termini.",
+        "More petrol stations for diesel fuel."
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "What overall trend do the 2024 figures for energy use and CO₂ emissions show for Berlin?",
+      options: [
+        "Energy use and emissions are slowly going down.",
+        "Energy use and emissions are exploding.",
+        "Nothing at all has changed in recent years."
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "Which combination best describes a positive development for Berlin’s climate policy?",
+      options: [
+        "Falling CO₂ emissions together with a functioning city economy.",
+        "Higher emissions and a completely collapsing economy.",
+        "Only economic growth, without looking at emissions at all."
+      ],
+      correctIndex: 0
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  const quizContainer = document.getElementById("quiz-container");
+  const resultContainer = document.getElementById("result-container");
+
+  const progressTextEl = document.getElementById("progress-text");
+  const scoreTextEl = document.getElementById("score-text");
+  const questionTextEl = document.getElementById("question-text");
+  const optionsEl = document.getElementById("options");
+  const errorTextEl = document.getElementById("error-text");
+
+  const nextButton = document.getElementById("next-button");
+  const restartButton = document.getElementById("restart-button");
+
+  const resultMainEl = document.getElementById("result-main");
+  const resultExtraEl = document.getElementById("result-extra");
+  const resultMessageEl = document.getElementById("result-message");
+  const playAgainButton = document.getElementById("play-again-button");
+
+  function renderQuestion() {
+    const total = questions.length;
+    const current = currentQuestionIndex + 1;
+    const q = questions[currentQuestionIndex];
+
+    progressTextEl.textContent = "Question " + current + " of " + total;
+    scoreTextEl.textContent = "Score: " + score;
+    errorTextEl.textContent = "";
+
+    questionTextEl.textContent = q.question;
+    optionsEl.innerHTML = "";
+
+    q.options.forEach(function(optionText, index) {
+      const label = document.createElement("label");
+      label.className = "option-item";
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "quiz-option";
+      input.value = index.toString();
+
+      const span = document.createElement("span");
+      span.className = "option-text";
+      span.textContent = optionText;
+
+      label.appendChild(input);
+      label.appendChild(span);
+      optionsEl.appendChild(label);
+    });
+
+    restartButton.style.display = currentQuestionIndex === 0 ? "none" : "inline-block";
+    nextButton.textContent = currentQuestionIndex === total - 1 ? "Show result" : "Next";
+  }
+
+  function getSelectedOptionIndex() {
+    const inputs = document.querySelectorAll('input[name="quiz-option"]');
+    for (let i = 0; i < inputs.length; i++) {
+      if (inputs[i].checked) return parseInt(inputs[i].value, 10);
+    }
+    return null;
+  }
+
+  function showResultView() {
+    const total = questions.length;
+    const percent = Math.round((score / total) * 100);
+
+    quizContainer.style.display = "none";
+    resultContainer.style.display = "block";
+
+    resultMainEl.textContent =
+      "You answered " + score + " out of " + total + " questions correctly.";
+    resultExtraEl.textContent = "That is " + percent + " percent.";
+
+    let message;
+    if (percent === 100) {
+      message = "Incredible – you really know Berlin’s climate and transport topics in detail. Climate expert unlocked.";
+    } else if (percent >= 80) {
+      message = "Very strong! You have a solid understanding of climate action and mobility in Berlin. Just a few details left to polish.";
+    } else if (percent >= 60) {
+      message = "Good base! You know quite a bit already. With a bit more reading on Berlin’s climate goals you will level up quickly.";
+    } else if (percent >= 40) {
+      message = "Okay – you got some things right, but there is still room to grow. Use this quiz as a starting point.";
+    } else {
+      message = "You are at the starting line – and that is totally fine. This result is a good reason to look more closely at Berlin’s climate and transport policies.";
+    }
+
+    resultMessageEl.textContent = message;
+  }
+
+  function resetQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    quizContainer.style.display = "block";
+    resultContainer.style.display = "none";
+    renderQuestion();
+  }
+
+  nextButton.addEventListener("click", function() {
+    const selectedIndex = getSelectedOptionIndex();
+    if (selectedIndex === null) {
+      errorTextEl.textContent = "Please select an answer before you continue.";
+      return;
+    }
+
+    errorTextEl.textContent = "";
+
+    const currentQuestion = questions[currentQuestionIndex];
+    if (selectedIndex === currentQuestion.correctIndex) {
+      score += 1;
+      scoreTextEl.textContent = "Score: " + score;
+    }
+
+    if (currentQuestionIndex === questions.length - 1) {
+      showResultView();
+    } else {
+      currentQuestionIndex += 1;
+      renderQuestion();
+    }
+  });
+
+  restartButton.addEventListener("click", resetQuiz);
+  playAgainButton.addEventListener("click", resetQuiz);
+
+  renderQuestion();
+</script>
+</body>
+</html>
